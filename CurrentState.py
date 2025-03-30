@@ -2,15 +2,15 @@ from collections import deque
 
 class CurrentStateUpdate():
   def __init__(self):
-    self.predictions = deque(["neutral" for i in range(10)])
-    self.counts = {"neutral": 10,
+    self.predictions = deque(["neutral" for i in range(180)])
+    self.counts = {"neutral": 180,
                    "sad": 0,
                    "happy": 0,
                    "angry": 0,
                    "disgust": 0,
                    "fear": 0,
                    "surprise": 0}
-    self.curr_max = 10
+    self.curr_max = 180
     self.state = "neutral"
 
   def update_state(self, emotion):

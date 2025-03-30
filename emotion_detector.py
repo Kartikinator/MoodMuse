@@ -5,6 +5,13 @@ from PIL import Image
 import numpy as np
 from CurrentState import CurrentStateUpdate
 from MoodMuse import MoodMuse
+import threading
+from queue import Queue, Empty
+import time
+import pygame
+
+# Initialize pygame
+pygame.init()
 
 # Initialize the emotion recognition pipeline using the specified model.
 print("Loading model...")
@@ -18,6 +25,28 @@ print("Model loaded successfully!")
 current_state = CurrentStateUpdate()
 mood_muse = MoodMuse(debug=True)  # Enable debug mode
 
+# Create a queue for emotion updates
+emotion_queue = Queue()
+is_running = True
+
+def music_handler():
+    """Background thread to handle music updates"""
+    while is_running:
+        try:
+            # Get emotion from queue with timeout
+            emotion = emotion_queue.get(timeout=0.1)
+            if emotion and mood_muse.is_valid_emotion(emotion):
+                mood_muse.set_emotion(emotion)
+        except Empty:
+            continue
+        except Exception as e:
+            print(f"Error in music handler: {str(e)}")
+
+# Start the music handler thread
+music_thread = threading.Thread(target=music_handler)
+music_thread.daemon = True  # Thread will exit when main program exits
+music_thread.start()
+
 # Check if music files exist
 if not mood_muse.check_music_files():
     print("WARNING: No music files found. Please add music files to the music_files directory.")
@@ -28,6 +57,10 @@ face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_fronta
 
 # Open a connection to the primary webcam.
 cap = cv2.VideoCapture(0)
+
+# Set a lower resolution for the webcam
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)  # Reduced from default (usually 1280)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)  # Reduced from default (usually 720)
 
 # Define emotion labels mapping
 emotion_labels = {
@@ -85,6 +118,14 @@ try:
         if not ret:
             break
 
+        # Process pygame events for music crossfading
+        for event in pygame.event.get():
+            if event.type == pygame.USEREVENT:
+                mood_muse._crossfade_step()
+
+        # Resize frame to a smaller size for faster processing
+        frame = cv2.resize(frame, (640, 480))
+
         # Convert frame to grayscale for face detection.
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
@@ -112,9 +153,8 @@ try:
                     true_emotion = current_state.update_state(emotion)
                     print(f"True emotion: {true_emotion}")  # Debug print
 
-                    # Update music (use lowercase emotion)
-                    if mood_muse.is_valid_emotion(true_emotion):
-                        mood_muse.set_emotion(true_emotion)
+                    # Queue the emotion update for the music handler
+                    emotion_queue.put(true_emotion)
                     
                     # Display emotion and confidence (use mapped emotion for display)
                     display_emotion(frame, x, y, w, h, display_emotion_text, confidence)
@@ -135,6 +175,8 @@ try:
 
 finally:
     # Clean up
+    is_running = False  # Signal the music handler to stop
+    music_thread.join(timeout=1.0)  # Wait for music handler to finish
     cap.release()
     cv2.destroyAllWindows()
     mood_muse.shutdown()  # Properly shut down MoodMuse

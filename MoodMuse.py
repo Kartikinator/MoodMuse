@@ -62,7 +62,7 @@ class MoodMuse:
                 "music_files/angry/Limp Bizkit - Break Stuff (Official Music Video).mp3"
             ],
             "fear": [
-                "music_files/fear\Hans Zimmer - Time (Official Audio).mp3",
+                "music_files/fear/Hans Zimmer - Time (Official Audio).mp3",
                 "music_files/fear/John Carpenter - HALLOWEEN Theme.mp3",
                 "music_files/fear/Psycho  Main Theme  Bernard Herrmann.mp3"
             ],
@@ -72,24 +72,23 @@ class MoodMuse:
                 "music_files/neutral/@coldplay - Fix You (Lyrics).mp3"
             ],
             "sad": [
-                "music_files/sad/song1.mp3",
-                "music_files/sad/song2.mp3",
-                "music_files/sad/song3.mp3"
+                "music_files/sad/Joji - Glimpse Of Us.mp3",
+                "music_files/sad/John Legend - All of Me (Lyrics).mp3",
+                "music_files/sad/Adele - Hello (Lyrics).mp3"
             ],
             "disgust": [
-                "music_files/disgust/song1.mp3",
-                "music_files/disgust/song2.mp3",
-                "music_files/disgust/song3.mp3"
+                "music_files/disgust/Marilyn Manson - The Beautiful People.mp3",
+                "music_files/disgust/Drowning Pool - Bodies (Official Lyric Video).mp3",
+                "music_files/disgust/Down with the Sickness.mp3"
             ],
             "happy": [
-                "music_files/happy/song1.mp3",
-                "music_files/happy/song2.mp3",
-                "music_files/happy/song3.mp3"
+                "music_files/happy/The Beach Boys - Good Vibrations.mp3",
+                "music_files/happy/Pharrell Williams - Happy (Lyrics).mp3",
+                "music_files/happy/Katrina & The Waves - Walking On Sunshine (Official Music Video).mp3"
             ],
             "surprise": [
-                "music_files/surprise/song1.mp3",
-                "music_files/surprise/song2.mp3",
-                "music_files/surprise/song3.mp3"
+                "music_files/surprise/John Williams - Anakin's Betrayal.mp3",
+                "music_files/surprise/Franz Joseph Haydn - Surprise (Symphony no. 94).mp3"
             ]
         }
     
@@ -176,30 +175,18 @@ class MoodMuse:
                 new_channel.play(new_sound, loops=-1)
                 new_channel.set_volume(0.0)
                 
-                # Perform the crossfade
+                # Perform the crossfade using pygame's timing
                 steps = 30
-                step_time = duration / steps
-                for i in range(steps + 1):
-                    # Calculate volumes: old decreases, new increases
-                    old_volume = 1.0 - (i / steps)
-                    new_volume = i / steps
-                    
-                    # Set the volumes
-                    old_channel.set_volume(old_volume)
-                    new_channel.set_volume(new_volume)
-                    
-                    # Wait for next step
-                    time.sleep(step_time)
+                step_time = int(duration * 1000 / steps)  # Convert to milliseconds
                 
-                # Ensure final volumes are correct
-                old_channel.set_volume(0.0)
-                new_channel.set_volume(1.0)
+                # Set up the crossfade
+                pygame.time.set_timer(pygame.USEREVENT, step_time)
+                self.crossfade_step = 0
+                self.crossfade_channels = (old_channel, new_channel)
+                self.crossfade_steps = steps
                 
-                # Stop the old channel
-                old_channel.stop()
-                
-                # Update current channel
-                self.current_state["current_channel"] = new_channel_num
+                # Start the crossfade
+                self._crossfade_step()
                 
             except Exception as e:
                 if self.debug:
@@ -230,6 +217,33 @@ class MoodMuse:
                     print(f"Failed to recover from crossfade error: {e2}")
                     print(f"Song path that failed: {new_song_path}")
                     print(f"Does file exist? {os.path.exists(new_song_path)}")
+    
+    def _crossfade_step(self):
+        """Handle a single step of the crossfade"""
+        if not hasattr(self, 'crossfade_step'):
+            return
+            
+        old_channel, new_channel = self.crossfade_channels
+        
+        # Calculate volumes
+        old_volume = 1.0 - (self.crossfade_step / self.crossfade_steps)
+        new_volume = self.crossfade_step / self.crossfade_steps
+        
+        # Set the volumes
+        old_channel.set_volume(old_volume)
+        new_channel.set_volume(new_volume)
+        
+        # Move to next step
+        self.crossfade_step += 1
+        
+        if self.crossfade_step <= self.crossfade_steps:
+            # Schedule next step
+            pygame.time.set_timer(pygame.USEREVENT, int(1000 / 30))  # 30fps
+        else:
+            # Crossfade complete
+            old_channel.stop()
+            self.current_state["current_channel"] = 1 if self.current_state["current_channel"] == 0 else 0
+            pygame.time.set_timer(pygame.USEREVENT, 0)  # Stop the timer
     
     def set_emotion(self, new_emotion):
         """
