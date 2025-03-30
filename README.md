@@ -24,10 +24,8 @@ In everyday life, people often experience emotional states that go unrecognized�
 ---
 
 ## 🖥️ Frontend Preview
-
-> _The frontend is currently under construction and will be merged with the backend soon._
-
-(Work in Progress)
+Playlists matching detected mood
+![Alt text](MoodMuse/DemoImages/MoodPlaylist.jpg)
 
 ---
 
