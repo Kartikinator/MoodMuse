@@ -27,12 +27,7 @@ In everyday life, people often experience emotional states that go unrecognizedâ
 
 > _The frontend is currently under construction and will be merged with the backend soon._
 
-You can still preview the current UI dashboard and camera status features with mockups or screenshots below:
-
-![Dashboard Screenshot](images/frontend_1.png)
-![Live Camera Feed with Emotion Labels](images/frontend_2.png)
-
-_(Add your actual screenshots to `images/` folder and replace the filenames above.)_
+(Work in Progress)
 
 ---
 
