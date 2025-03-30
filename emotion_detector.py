@@ -10,6 +10,10 @@ from queue import Queue, Empty
 import time
 import pygame
 
+"""
+This is the main file. Starts the camera to detect emotion. 
+"""
+
 # Initialize pygame
 pygame.init()
 
@@ -83,9 +87,20 @@ def process_face(face_img):
         # Get prediction
         results = emotion_classifier(pil_image)
         print(f"Raw model output: {results}")  # Debug print
+        
         if results and len(results) > 0:
-            print(f"Detected emotion: {results[0]}")  # Debug print
-            return results[0]  # Return just the first result
+            # Use a lower threshold for all emotions
+            if results[0]['score'] > 0.2:  # 20% threshold for all emotions
+                # Map angry to sad
+                if results[0]['label'].lower() == 'angry':
+                    results[0]['label'] = 'sad'
+                    print(f"Mapped angry to sad: {results[0]}")  # Debug print
+                print(f"Detected emotion: {results[0]}")  # Debug print
+                return results[0]
+            
+            # If no emotion meets the threshold, return neutral with low confidence
+            return {'label': 'neutral', 'score': 0.2}
+            
         return None
     except Exception as e:
         print(f"Error in process_face: {str(e)}")  # Debug print
