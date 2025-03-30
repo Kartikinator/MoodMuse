@@ -1,15 +1,19 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-type ModeType = 'support' | 'therapy';
+export type ModeType = 'support' | 'therapy';
 
-interface ModeContextType {
+export interface ModeContextType {
   mode: ModeType;
   setMode: (mode: ModeType) => void;
 }
 
 const ModeContext = createContext<ModeContextType | undefined>(undefined);
 
-export const ModeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+interface ModeProviderProps {
+  children: ReactNode;
+}
+
+export const ModeProvider: React.FC<ModeProviderProps> = ({ children }) => {
   const [mode, setMode] = useState<ModeType>('support');
 
   return (

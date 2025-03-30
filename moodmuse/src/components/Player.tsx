@@ -3,8 +3,15 @@ import styled from 'styled-components';
 import { Howl } from 'howler';
 import { useMode } from '../hooks/useMode';
 
+// Import the EmotionType
+type EmotionType = 'happy' | 'sad' | 'angry' | 'neutral' | 'surprised';
+type ModeType = 'support' | 'therapy';
+
+// Use ReturnType instead of NodeJS.Timeout
+type Timeout = ReturnType<typeof setTimeout>;
+
 interface PlayerProps {
-  currentMood: string;
+  currentMood: EmotionType | string;
 }
 
 const PlayerContainer = styled.div`
@@ -172,8 +179,22 @@ const ProgressContainer = styled.div`
   }
 `;
 
-// Mock music library based on moods
-const musicLibrary = {
+// Update the music library type
+interface TrackInfo {
+  title: string;
+  artist: string;
+  artwork: string;
+  src: string;
+}
+
+interface MusicLibraryByMode {
+  [key: string]: {
+    [key in EmotionType]: TrackInfo;
+  };
+}
+
+// Update the music library definition
+const musicLibrary: MusicLibraryByMode = {
   support: {
     happy: {
       title: "Good Vibes",
@@ -250,18 +271,21 @@ const Player: React.FC<PlayerProps> = ({ currentMood }) => {
   const { mode } = useMode();
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.7);
-  const [currentTrack, setCurrentTrack] = useState(musicLibrary[mode][currentMood]);
+  const [currentTrack, setCurrentTrack] = useState(musicLibrary[mode][currentMood as EmotionType]);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(180); // Mock duration
   const [currentTime, setCurrentTime] = useState(0);
   
   // Reference for audio object (would be a real Howl instance in production)
   const soundRef = useRef<Howl | null>(null);
-  const progressInterval = useRef<NodeJS.Timeout | null>(null);
+  const progressInterval = useRef<Timeout | null>(null);
+  
+  // Get emotion as EmotionType
+  const emotion = currentMood as EmotionType;
   
   // Effect to change song when mood or mode changes
   useEffect(() => {
-    const newTrack = musicLibrary[mode][currentMood];
+    const newTrack = musicLibrary[mode][emotion];
     setCurrentTrack(newTrack);
     
     // Reset player
@@ -284,7 +308,7 @@ const Player: React.FC<PlayerProps> = ({ currentMood }) => {
       // soundRef.current.play();
       startProgressTracking();
     }
-  }, [currentMood, mode]);
+  }, [emotion, mode]);
   
   // Effect to handle volume changes
   useEffect(() => {
@@ -350,7 +374,7 @@ const Player: React.FC<PlayerProps> = ({ currentMood }) => {
   };
   
   // Functions to get color based on mood
-  const getMoodColor = (mood: string) => {
+  const getMoodColor = (mood: EmotionType): string => {
     switch (mood) {
       case 'happy': return 'var(--happy)';
       case 'sad': return 'var(--sad)';
@@ -374,8 +398,8 @@ const Player: React.FC<PlayerProps> = ({ currentMood }) => {
           <h2>{currentTrack.title}</h2>
           <div className="artist">{currentTrack.artist}</div>
           <div>
-            <span className="mood-tag" style={{ backgroundColor: getMoodColor(currentMood) }}>
-              {currentMood.charAt(0).toUpperCase() + currentMood.slice(1)}
+            <span className="mood-tag" style={{ backgroundColor: getMoodColor(emotion) }}>
+              {emotion.charAt(0).toUpperCase() + emotion.slice(1)}
             </span>
             <span className="mood-tag">
               {getModeText(mode)} Mode

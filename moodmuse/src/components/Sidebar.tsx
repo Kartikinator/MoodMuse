@@ -2,7 +2,28 @@ import React from 'react';
 import styled from 'styled-components';
 import { useMode } from '../hooks/useMode';
 
-const SidebarContainer = styled.aside`
+// Add type definitions
+type ModeType = 'support' | 'therapy';
+
+// Define theme interface
+interface ThemeInterface {
+  colors: {
+    bgSecondary: string;
+    bgTertiary: string;
+    accentPrimary: string;
+    accentSecondary: string;
+    textPrimary: string;
+    textSecondary: string;
+    [key: string]: string;
+  };
+  transitions: {
+    standard: string;
+    [key: string]: string;
+  };
+}
+
+// Add proper typing to styled-components
+const SidebarContainer = styled.aside<{ theme: ThemeInterface }>`
   width: 280px;
   height: 100vh;
   background-color: ${({ theme }) => theme.colors.bgSecondary};
@@ -52,6 +73,7 @@ const ModeTabs = styled.div`
 
 interface ModeButtonProps {
   active: boolean;
+  theme?: ThemeInterface;
 }
 
 const ModeButton = styled.button<ModeButtonProps>`
