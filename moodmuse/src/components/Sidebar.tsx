@@ -2,28 +2,37 @@ import React from 'react';
 import styled from 'styled-components';
 import { useMode } from '../hooks/useMode';
 
-// Add type definitions
-type ModeType = 'support' | 'therapy';
-
-// Define theme interface
-interface ThemeInterface {
+// Add Theme interface for styled-components
+interface Theme {
   colors: {
+    bgPrimary: string;
     bgSecondary: string;
     bgTertiary: string;
-    accentPrimary: string;
-    accentSecondary: string;
     textPrimary: string;
     textSecondary: string;
+    accentPrimary: string;
+    accentSecondary: string;
+    accentTertiary: string;
+    [key: string]: string;
+  };
+  shadows: {
+    card: string;
     [key: string]: string;
   };
   transitions: {
     standard: string;
     [key: string]: string;
   };
+  breakpoints: {
+    sm: string;
+    md: string;
+    lg: string;
+    xl: string;
+    [key: string]: string;
+  };
 }
 
-// Add proper typing to styled-components
-const SidebarContainer = styled.aside<{ theme: ThemeInterface }>`
+const SidebarContainer = styled.aside<{ theme: Theme }>`
   width: 280px;
   height: 100vh;
   background-color: ${({ theme }) => theme.colors.bgSecondary};
@@ -33,7 +42,7 @@ const SidebarContainer = styled.aside<{ theme: ThemeInterface }>`
   flex-direction: column;
 `;
 
-const Logo = styled.div`
+const Logo = styled.div<{ theme: Theme }>`
   display: flex;
   align-items: center;
   margin-bottom: 3rem;
@@ -48,7 +57,7 @@ const Logo = styled.div`
   }
 `;
 
-const LogoIcon = styled.div`
+const LogoIcon = styled.div<{ theme: Theme }>`
   width: 40px;
   height: 40px;
   border-radius: 8px;
@@ -58,7 +67,7 @@ const LogoIcon = styled.div`
   justify-content: center;
 `;
 
-const ModeTabs = styled.div`
+const ModeTabs = styled.div<{ theme: Theme }>`
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -73,7 +82,7 @@ const ModeTabs = styled.div`
 
 interface ModeButtonProps {
   active: boolean;
-  theme?: ThemeInterface;
+  theme: Theme;
 }
 
 const ModeButton = styled.button<ModeButtonProps>`
@@ -95,7 +104,7 @@ const ModeButton = styled.button<ModeButtonProps>`
   }
 `;
 
-const Footer = styled.div`
+const Footer = styled.div<{ theme: Theme }>`
   margin-top: auto;
   font-size: 0.85rem;
   color: ${({ theme }) => theme.colors.textSecondary};

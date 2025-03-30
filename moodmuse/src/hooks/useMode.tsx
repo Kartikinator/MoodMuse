@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 export type ModeType = 'support' | 'therapy';
 
-export interface ModeContextType {
+interface ModeContextType {
   mode: ModeType;
   setMode: (mode: ModeType) => void;
 }

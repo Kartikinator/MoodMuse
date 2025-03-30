@@ -5,10 +5,7 @@ import Header from './components/Header'
 import MoodDetector from './components/MoodDetector'
 import Player from './components/Player'
 import { ModeProvider } from './hooks/useMode'
-import { theme, ThemeInterface } from './styles/theme'
-
-// Define the emotion type
-type EmotionType = 'happy' | 'sad' | 'angry' | 'neutral' | 'surprised'
+import { theme } from './styles/theme'
 
 const AppContainer = styled.div`
   display: flex;
@@ -33,7 +30,7 @@ const MainContent = styled.main`
 `
 
 function App() {
-  const [currentMood, setCurrentMood] = useState<EmotionType>('neutral')
+  const [currentMood, setCurrentMood] = useState<string>('neutral');
 
   return (
     <ThemeProvider theme={theme}>
@@ -43,7 +40,7 @@ function App() {
           <MainSection>
             <Header />
             <MainContent>
-              <MoodDetector onMoodDetected={(mood: string) => setCurrentMood(mood as EmotionType)} />
+              <MoodDetector onMoodDetected={setCurrentMood} />
               <Player currentMood={currentMood} />
             </MainContent>
           </MainSection>

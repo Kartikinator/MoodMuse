@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
-// Define theme interface
-interface ThemeInterface {
+// Adding Theme type for styled-components
+interface Theme {
   colors: {
     bgPrimary: string;
     bgSecondary: string;
@@ -11,16 +11,28 @@ interface ThemeInterface {
     textSecondary: string;
     accentPrimary: string;
     accentSecondary: string;
+    accentTertiary: string;
+    [key: string]: string;
+  };
+  shadows: {
+    card: string;
     [key: string]: string;
   };
   transitions: {
     standard: string;
     [key: string]: string;
   };
+  breakpoints: {
+    sm: string;
+    md: string;
+    lg: string;
+    xl: string;
+    [key: string]: string;
+  };
 }
 
-// Add proper theme typing to styled components
-const HeaderContainer = styled.header`
+// Styled components with proper type information for theme
+const HeaderContainer = styled.header<{ theme: Theme }>`
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -28,7 +40,7 @@ const HeaderContainer = styled.header`
   width: 100%;
 `;
 
-const SearchBar = styled.div`
+const SearchBar = styled.div<{ theme: Theme }>`
   position: relative;
   width: 300px;
   margin-right: auto;
@@ -62,13 +74,13 @@ const SearchBar = styled.div`
   }
 `;
 
-const NavItems = styled.div`
+const NavItems = styled.div<{ theme: Theme }>`
   display: flex;
   align-items: center;
   gap: 1.5rem;
 `;
 
-const NavLink = styled.a`
+const NavLink = styled.a<{ theme: Theme }>`
   color: ${({ theme }) => theme.colors.textSecondary};
   font-weight: 500;
   transition: ${({ theme }) => theme.transitions.standard};
@@ -78,7 +90,7 @@ const NavLink = styled.a`
   }
 `;
 
-const ProfileButton = styled.button`
+const ProfileButton = styled.button<{ theme: Theme }>`
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -111,12 +123,7 @@ const ProfileButton = styled.button`
   }
 `;
 
-interface DropdownProps {
-  isOpen: boolean;
-  theme?: ThemeInterface;
-}
-
-const DropdownMenu = styled.div<DropdownProps>`
+const DropdownMenu = styled.div<{ isOpen: boolean; theme: Theme }>`
   position: absolute;
   top: 70px;
   right: 2rem;
@@ -132,7 +139,7 @@ const DropdownMenu = styled.div<DropdownProps>`
   transition: all 0.2s ease;
 `;
 
-const MenuItem = styled.a`
+const MenuItem = styled.a<{ theme: Theme }>`
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -150,7 +157,7 @@ const MenuItem = styled.a`
   }
 `;
 
-const Divider = styled.div`
+const Divider = styled.div<{ theme: Theme }>`
   height: 1px;
   width: 100%;
   background-color: ${({ theme }) => theme.colors.bgTertiary};

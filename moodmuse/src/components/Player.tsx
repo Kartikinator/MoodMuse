@@ -1,17 +1,30 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { Howl } from 'howler';
-import { useMode } from '../hooks/useMode';
+import { useMode, ModeType } from '../hooks/useMode';
 
-// Import the EmotionType
+// Add Emotion type definition
 type EmotionType = 'happy' | 'sad' | 'angry' | 'neutral' | 'surprised';
-type ModeType = 'support' | 'therapy';
 
-// Use ReturnType instead of NodeJS.Timeout
-type Timeout = ReturnType<typeof setTimeout>;
+// Define type for music library
+interface Track {
+  title: string;
+  artist: string;
+  artwork: string;
+  src: string;
+}
+
+interface MoodLibrary {
+  [key: string]: Track;
+}
+
+interface MusicLibrary {
+  support: MoodLibrary;
+  therapy: MoodLibrary;
+}
 
 interface PlayerProps {
-  currentMood: EmotionType | string;
+  currentMood: string;
 }
 
 const PlayerContainer = styled.div`
@@ -179,22 +192,8 @@ const ProgressContainer = styled.div`
   }
 `;
 
-// Update the music library type
-interface TrackInfo {
-  title: string;
-  artist: string;
-  artwork: string;
-  src: string;
-}
-
-interface MusicLibraryByMode {
-  [key: string]: {
-    [key in EmotionType]: TrackInfo;
-  };
-}
-
-// Update the music library definition
-const musicLibrary: MusicLibraryByMode = {
+// Update the musicLibrary variable type
+const musicLibrary: MusicLibrary = {
   support: {
     happy: {
       title: "Good Vibes",
@@ -261,17 +260,40 @@ const musicLibrary: MusicLibraryByMode = {
   }
 };
 
+// Add Timeout type for timers
+type Timeout = ReturnType<typeof setTimeout>;
+
 const formatTime = (seconds: number): string => {
   const min = Math.floor(seconds / 60);
   const sec = Math.floor(seconds % 60);
   return `${min}:${sec < 10 ? '0' + sec : sec}`;
 };
 
+// Add a function to get the opposite emotion for therapy mode
+const getOppositeEmotion = (emotion: EmotionType): EmotionType => {
+  switch (emotion) {
+    case 'happy': return 'sad';
+    case 'sad': return 'happy';
+    case 'angry': return 'neutral';
+    case 'neutral': return 'surprised';
+    case 'surprised': return 'neutral';
+    default: return 'happy';
+  }
+};
+
 const Player: React.FC<PlayerProps> = ({ currentMood }) => {
   const { mode } = useMode();
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.7);
-  const [currentTrack, setCurrentTrack] = useState(musicLibrary[mode][currentMood as EmotionType]);
+  
+  // For therapy mode, select the song for the opposite emotion
+  const effectiveEmotion = mode === 'therapy' 
+    ? getOppositeEmotion(currentMood as EmotionType) 
+    : currentMood as EmotionType;
+    
+  const [currentTrack, setCurrentTrack] = useState<Track>(
+    musicLibrary[mode as ModeType][effectiveEmotion]
+  );
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(180); // Mock duration
   const [currentTime, setCurrentTime] = useState(0);
@@ -280,12 +302,14 @@ const Player: React.FC<PlayerProps> = ({ currentMood }) => {
   const soundRef = useRef<Howl | null>(null);
   const progressInterval = useRef<Timeout | null>(null);
   
-  // Get emotion as EmotionType
-  const emotion = currentMood as EmotionType;
-  
   // Effect to change song when mood or mode changes
   useEffect(() => {
-    const newTrack = musicLibrary[mode][emotion];
+    // For therapy mode, select the song for the opposite emotion
+    const effectiveEmotion = mode === 'therapy' 
+      ? getOppositeEmotion(currentMood as EmotionType) 
+      : currentMood as EmotionType;
+      
+    const newTrack = musicLibrary[mode as ModeType][effectiveEmotion];
     setCurrentTrack(newTrack);
     
     // Reset player
@@ -308,7 +332,7 @@ const Player: React.FC<PlayerProps> = ({ currentMood }) => {
       // soundRef.current.play();
       startProgressTracking();
     }
-  }, [emotion, mode]);
+  }, [currentMood, mode, volume]);
   
   // Effect to handle volume changes
   useEffect(() => {
@@ -374,7 +398,7 @@ const Player: React.FC<PlayerProps> = ({ currentMood }) => {
   };
   
   // Functions to get color based on mood
-  const getMoodColor = (mood: EmotionType): string => {
+  const getMoodColor = (mood: string) => {
     switch (mood) {
       case 'happy': return 'var(--happy)';
       case 'sad': return 'var(--sad)';
@@ -385,7 +409,19 @@ const Player: React.FC<PlayerProps> = ({ currentMood }) => {
   };
   
   const getModeText = (mode: string) => {
-    return mode === 'support' ? 'Matching' : 'Counterbalancing';
+    return mode === 'support' ? 'Matching' : 'Counteracting';
+  };
+
+  const getTherapyInfo = () => {
+    if (mode === 'therapy') {
+      const targetEmotion = getOppositeEmotion(currentMood as EmotionType);
+      return (
+        <span className="mood-tag" style={{ backgroundColor: getMoodColor(targetEmotion) }}>
+          Target: {targetEmotion.charAt(0).toUpperCase() + targetEmotion.slice(1)}
+        </span>
+      );
+    }
+    return null;
   };
   
   return (
@@ -398,12 +434,13 @@ const Player: React.FC<PlayerProps> = ({ currentMood }) => {
           <h2>{currentTrack.title}</h2>
           <div className="artist">{currentTrack.artist}</div>
           <div>
-            <span className="mood-tag" style={{ backgroundColor: getMoodColor(emotion) }}>
-              {emotion.charAt(0).toUpperCase() + emotion.slice(1)}
+            <span className="mood-tag" style={{ backgroundColor: getMoodColor(currentMood) }}>
+              {currentMood.charAt(0).toUpperCase() + currentMood.slice(1)}
             </span>
             <span className="mood-tag">
               {getModeText(mode)} Mode
             </span>
+            {getTherapyInfo()}
           </div>
         </div>
       </NowPlaying>

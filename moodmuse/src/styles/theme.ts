@@ -1,43 +1,4 @@
-// Define the theme interface
-export interface ThemeInterface {
-  colors: {
-    bgPrimary: string;
-    bgSecondary: string;
-    bgTertiary: string;
-    textPrimary: string;
-    textSecondary: string;
-    accentPrimary: string;
-    accentSecondary: string;
-    accentTertiary: string;
-    success: string;
-    warning: string;
-    error: string;
-    happy: string;
-    sad: string;
-    angry: string;
-    neutral: string;
-    surprised: string;
-    [key: string]: string;
-  };
-  shadows: {
-    card: string;
-    [key: string]: string;
-  };
-  transitions: {
-    standard: string;
-    [key: string]: string;
-  };
-  breakpoints: {
-    sm: string;
-    md: string;
-    lg: string;
-    xl: string;
-    [key: string]: string;
-  };
-}
-
-// Export the theme object with proper typing
-export const theme: ThemeInterface = {
+export const theme = {
   colors: {
     bgPrimary: 'var(--bg-primary)',
     bgSecondary: 'var(--bg-secondary)',
@@ -68,4 +29,4 @@ export const theme: ThemeInterface = {
     lg: '992px',
     xl: '1200px',
   },
-}; 
+} 
