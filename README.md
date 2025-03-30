@@ -24,10 +24,10 @@ In everyday life, people often experience emotional states that go unrecognized�
 ---
 
 ## 🖥️ Frontend Preview
-- **Playlists matching detected mood**
+- **Autoplay music matching detected mood**
 ![MoodMatchingMode](DemoImages/MoodPlaylist.jpg)
 
-- **Playlists to sooth poor mood**
+- **Autoplay music to soothe poor mood**
 ![MoodCounteractMode](DemoImages/TherapyPlaylist.jpg)
 
 - **Mood statistics collected over session**
