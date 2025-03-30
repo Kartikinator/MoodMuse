@@ -70,17 +70,12 @@ In everyday life, people often experience emotional states that go unrecognizedâ
    ...
    ```
 
-3. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. Run the system:
+3. Run the system:
    ```bash
    python emotion_detector.py
    ```
 
-5. A webcam window will appear. Make facial expressions to see the emotion update and music playback adjust accordingly.
+4. A webcam window will appear. Make facial expressions to see the emotion update and music playback adjust accordingly.
 
 ---
 
