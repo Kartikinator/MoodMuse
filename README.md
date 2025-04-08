@@ -6,7 +6,7 @@ MoodMuse is a real-time, emotion-aware music player that uses facial expression 
 
 ---
 
-## 🧠 Why We Built This
+## 🧠 Why We Built MoodMuse
 
 In everyday life, people often experience emotional states that go unrecognized—especially in moments of stress, anxiety, or fatigue. MoodMuse is built to passively support mental health through adaptive music, turning real-time facial emotion data into calming, energizing, or comforting music without any user input.
 
@@ -56,7 +56,7 @@ In everyday life, people often experience emotional states that go unrecognized�
 
 ---
 
-## 🛠️ Setup Instructions
+## 🛠️ Instructions to Setup
 
 > Note: You’ll need music files categorized by emotion in `music_files/<emotion>/`.
 
